@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Jogo da Velha</title>
+    <style>
+        /* Estilos de aparência do jogo */
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            gap: 2px;
+            margin: 30px auto;
+        }
+
+        .cell {
+            width: 100px;
+            height: 100px;
+            font-size: 40px;
+            text-align: center;
+            vertical-align: middle;
+            background-color: #f2f2f2;
+            border: 1px solid #ccc;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Jogo da Velha</h1>
+    <!-- Tabuleiro do jogo -->
+    <div class="board" id="board" onclick="makeMove(event)">
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+        <div class="cell"></div>
+    </div>
+    <!-- Status do jogo (quem ganhou, de quem é a vez, empate, etc.) -->
+    <p id="status"></p>
+
+    <script>
+        let currentPlayer = 'X';
+
+        function makeMove(event) {
+            const cell = event.target;
+            // Verificar se a célula clicada é válida e se já está preenchida
+            if (!cell.classList.contains('cell') || cell.innerText !== '') return;
+            // Preencher a célula com a marca do jogador atual
+            cell.innerText = currentPlayer;
+            // Verificar se o jogador atual venceu o jogo
+            if (checkWin()) {
+                document.getElementById('status').innerText = `Parabéns! O jogador ${currentPlayer} venceu!`;
+                disableBoard();
+            } else if (checkDraw()) {
+                // Verificar se houve empate
+                document.getElementById('status').innerText = 'Empate! O jogo terminou.';
+            } else {
+                // Alternar para o próximo jogador
+                currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+                document.getElementById('status').innerText = `É a vez do jogador ${currentPlayer}`;
+            }
+        }
+
+        function checkWin() {
+            // Pegar todas as células do tabuleiro
+            const cells = document.getElementsByClassName('cell');
+            // Padrões de vitória (linhas, colunas e diagonais)
+            const winPatterns = [
+                [0, 1, 2], [3, 4, 5], [6, 7, 8], // Linhas
+                [0, 3, 6], [1, 4, 7], [2, 5, 8], // Colunas
+                [0, 4, 8], [2, 4, 6] // Diagonais
+            ];
+
+            // Verificar se algum padrão de vitória foi alcançado
+            return winPatterns.some(pattern => {
+                const [a, b, c] = pattern;
+                return cells[a].innerText && cells[a].innerText === cells[b].innerText && cells[b].innerText === cells[c].innerText;
+            });
+        }
+
+        function checkDraw() {
+            // Verificar se todas as células estão preenchidas (empate)
+            return Array.from(document.getElementsByClassName('cell')).every(cell => cell.innerText);
+        }
+
+        function disableBoard() {
+            // Remover o evento de clique no tabuleiro após o término do jogo
+            document.getElementById('board').removeEventListener('click', makeMove);
+        }
+    </script>
+</body>
+
+</html>
